@@ -25,7 +25,7 @@ class CourseController extends Controller
         $course->save();
 
         return response()->json([
-            'message' => 'Successfully created course!'
+            'course' => $course
         ], 201);
     }
 
@@ -48,10 +48,13 @@ class CourseController extends Controller
 
     public function delete(Request $request){
         $course = Course::find($request->id);
+        // return response()->json([
+        //     'course' => $request->id
+        // ], 400);
         if(isset($course)){
             $course->delete();
             return response()->json([
-                'message' => 'Successfully deleted course!'
+                "courses" => Course::where("group_id",$request->group_id)->get()
             ], 201);
         }else{
             return response()->json([

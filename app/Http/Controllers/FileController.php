@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\File;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,7 @@ class FileController extends Controller
             'name' => $request->name,
         ]);
         $file->path = $request->file->getClientOriginalName();
-        $request->file->storeAs('files', $file->path);
+        $request->file->storeAs('public/files', $file->path);
 
 
         $file->user()->associate($request->user()->id);
@@ -29,7 +30,7 @@ class FileController extends Controller
         $file->save();
 
         return response()->json([
-            'message' => 'Successfully created file!'
+            'course' => Course::where("id", $request->course_id)->with(["files", "user"])->first()
         ], 201);
     }
 
@@ -54,14 +55,18 @@ class FileController extends Controller
         ], 201);
     }
 
-    public function delete(Request $request){
+    public function delete(Request $request)
+    {
         $file = File::find($request->id);
-        if(isset($file)){
+        // return response()->json([
+        //     'course' => $request->id
+        // ], 400);
+        if (isset($file)) {
             $file->delete();
             return response()->json([
-                'message' => 'Successfully deleted file!'
+                'course' => Course::where("id", $request->course_id)->with(['files', 'user'])->first()
             ], 201);
-        }else{
+        } else {
             return response()->json([
                 'error' => 'File Missing Create it !'
             ], 400);

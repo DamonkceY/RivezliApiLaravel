@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Course;
+use App\Models\Department;
+use App\Models\Group;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,7 +42,22 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
             Route::get('getUserPosts', 'AuthController@getUserPosts');
             Route::post('send', 'MessageController@send');
             Route::post('getGroupMessages', 'MessageController@getGroupMessages');
-            Route::get('getUserProfile/{id}','AuthController@getUserProfile');
+            Route::get('getUserProfile/{id}', 'AuthController@getUserProfile');
+            Route::get("mycourses",function(Request $request){
+                $user = User::where("id",$request->user()->id)->with(["group.courses.user"])->first();
+                $c = $user->group->courses;
+                return response()->json([
+                    "courses" => $c
+                ]);
+            });
+            Route::post("getCourseId",function(Request $request){
+
+
+                $c = Course::where("id",$request->id)->with(["files","user"])->first();
+                return response()->json([
+                    "course" => $c
+                ]);
+            });
         });
     });
 
@@ -48,11 +67,27 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
      *
      */
     Route::group(['prefix' => 'admin'], function () {
+        Route::get('allG', function () {
+            return response()->json([
+                'groups' => Group::with(['profs.group', 'profs.user', 'department', 'students'])->get()
+            ]);
+        });
+        Route::get('allProfs', function () {
+            return response()->json([
+                'profs' => User::where('role', 1)->with(['groups.group', 'groups.user'])->get()
+            ]);
+        });
+        Route::get('allDep', function () {
+            return response()->json([
+                'dep' => Department::all()
+            ]);
+        });
+
         Route::group(['middleware' => ['admin', 'auth:api']], function () {
             Route::group(['prefix' => 'department'], function () {
                 Route::post('/add', 'DepartmentController@store');
                 Route::post('/update', 'DepartmentController@update');
-                Route::delete('/delete', 'DepartmentController@delete');
+                Route::post('/delete', 'DepartmentController@delete');
             });
 
             Route::group(['prefix' => 'group'], function () {
@@ -65,8 +100,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
             Route::group(['prefix' => 'prof'], function () {
 
                 Route::post('/add', 'AdminController@createProf');
-                Route::post('/update', 'GroupController@update');
-                Route::delete('/delete', 'GroupController@delete');
+                Route::post('/relateProf', 'AdminController@relateProf');
             });
         });
     });
@@ -97,18 +131,43 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     });
 
 
+    /**
+     *
+     * Prof
+     *
+     */
+
+
     Route::group(['prefix' => 'prof'], function () {
+
         Route::group(['middleware' => ['auth:api', 'prof']], function () {
+            Route::get("myG", function ( Request $request) {
+                $p = User::where('id',$request->user()->id)->with("groups.group")->first();
+                return response()->json([
+                    "groups" => $p->groups
+                ]);
+            });
             Route::group(['prefix' => 'course'], function () {
                 Route::post('/add', 'CourseController@store');
                 Route::post('/update', 'CourseController@update');
-                Route::delete('/delete', 'CourseController@delete');
+                Route::post('/delete', 'CourseController@delete');
+                Route::post("getAllG", function(Request $request){
+                    return response()->json([
+                        "courses" => Course::where("group_id",$request->id)->get()
+                        // "courses" => $request->id
+                    ]);
+                });
+                Route::post("getCourseDetails",function(Request $request){
+                    return response()->json([
+                        "course"=> Course::where("id",$request->id)->with(['files','user'])->first()
+                    ]);
+                });
             });
 
             Route::group(['prefix' => 'file'], function () {
                 Route::post('/add', 'FileController@store');
                 Route::post('/update', 'FileController@update');
-                Route::delete('/delete', 'FileController@delete');
+                Route::post('/delete', 'FileController@delete');
             });
         });
     });

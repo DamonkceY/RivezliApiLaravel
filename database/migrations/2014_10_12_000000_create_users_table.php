@@ -22,7 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->integer('role')->default(0);
             $table->string('avatar')->default('default.png');
-            $table->foreign('group_id')->references('id')->on('groups');
+            $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
             $table->rememberToken();
             $table->timestamps();
         });

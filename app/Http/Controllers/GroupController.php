@@ -10,9 +10,10 @@ class GroupController extends Controller
 {
     public function getAll(){
         return response()->json([
-            'groups'=> Group::all()
+            'groups'=> Group::where("id","!=",1)->get()
         ]);
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -28,7 +29,7 @@ class GroupController extends Controller
         $group->save();
 
         return response()->json([
-            'message' => 'Successfully created group!'
+            'group' => $group
         ], 201);
     }
 
@@ -43,7 +44,7 @@ class GroupController extends Controller
             "name" => $request->group_name,
             'department_id' => $request->department_id,
         ];
-        if (Department::find($request->dpartment_id)) {
+        if (Department::find($request->department_id)) {
             $group = Group::find($request->id);
             $group->department()->dissociate();
             $group->department()->associate(Department::find($request->department_id));

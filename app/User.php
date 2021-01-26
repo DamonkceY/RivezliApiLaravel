@@ -17,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','role',
+        'name', 'email', 'password', 'role',
     ];
 
     /**
@@ -39,16 +39,25 @@ class User extends Authenticatable
     ];
 
 
-    public function group(){
+    public function group()
+    {
         return $this->belongsTo('App\Models\Group');
     }
-    public function posts(){
+    public function posts()
+    {
         return $this->hasMany('App\Models\Post');
     }
-    public function files(){
+    public function files()
+    {
         return $this->hasMany('\App\Models\File');
     }
-    public function messages(){
+    public function messages()
+    {
         return $this->hasMany('App\Models\Message');
+    }
+
+    public function groups()
+    {
+        return $this->hasMany('App\Models\ProfGroupRelation');
     }
 }

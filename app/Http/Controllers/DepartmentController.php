@@ -7,34 +7,33 @@ use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
+
     public function store(Request $request)
     {
         $request->validate([
-            'department_name' => 'required|string',
+            'name' => 'required|string',
         ]);
         $dep = new Department([
-            'name' => $request->department_name,
+            'name' => $request->name,
         ]);
 
         $dep->save();
 
 
         return response()->json([
-            'message' => 'Successfully created department!'
+            'dep' => $dep
         ], 201);
-
-
     }
 
-
-    public function update(Request $request, Department $department)
+    public function update(Request $request)
     {
         $request->validate([
-            'department_name' => 'required|string',
+            'name' => 'required|string',
         ]);
-        $data= [
-            "name" => $request->department_name,
+        $data = [
+            "name" => $request->name,
         ];
+
 
         if (Department::find($request->id)->update($data)) {
             return response()->json([
@@ -43,25 +42,19 @@ class DepartmentController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Group  $group
-     * @return \Illuminate\Http\Response
-     */
     public function delete(Request $request)
     {
         $g = Department::find($request->id);
-        if(isset($g)){
+
+        if (isset($g)) {
             $g->delete();
             return response()->json([
                 'message' => 'Successfully deleted department!'
             ], 201);
-        }else{
+        } else {
             return response()->json([
                 'error' => 'Department Missing Create it !'
             ], 400);
         }
     }
-
 }

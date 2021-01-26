@@ -13,6 +13,9 @@ class DepSeeder extends Seeder
     public function run()
     {
         DB::table('departments')->insert([
+            'name' => 'Administration'
+        ]);
+        DB::table('departments')->insert([
             'name' => 'INFO'
         ]);
     }

@@ -14,8 +14,11 @@ class Group extends Model
         return $this->belongsTo('App\Models\Department');
     }
 
-    public function students(){
+    public function users(){
         return $this->hasMany('App\User');
+    }
+    public function students(){
+        return $this->users()->where('role',0);
     }
 
     public function courses(){
@@ -25,4 +28,11 @@ class Group extends Model
     public function messages(){
         return $this->hasMany('App\Models\Message');
     }
+
+    public function profs()
+    {
+       return $this->hasMany('App\Models\ProfGroupRelation');
+    }
+
+
 }

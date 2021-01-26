@@ -14,14 +14,18 @@ class GroupSeeder extends Seeder
     {
         DB::table('groups')->insert([
             'department_id' => 1,
+            'name' => 'Admin'
+        ]);
+        DB::table('groups')->insert([
+            'department_id' => 2,
             'name' => 'DSI5.1'
         ]);
         DB::table('groups')->insert([
-            'department_id' => 1,
+            'department_id' => 2,
             'name' => 'MDW5.1'
         ]);
         DB::table('groups')->insert([
-            'department_id' => 1,
+            'department_id' => 2,
             'name' => 'RSI5.1'
         ]);
     }
